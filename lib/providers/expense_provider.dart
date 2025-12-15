@@ -1,4 +1,4 @@
-// lib/providers/expense_provider.dart
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -120,6 +120,7 @@ class ExpenseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
   Map<String, double> categoryTotals(ExpenseType type) {
     final totals = <String, double>{};
     for (final e in _expenses) {              // assuming your list is named `_expenses`
@@ -132,6 +133,21 @@ class ExpenseProvider extends ChangeNotifier {
       }
     }
     return totals;
+  }
+
+  Future<void> updateFriendExpense(FriendExpense updated) async {
+    final idx = _friendExpenses.indexWhere((e) => e.id == updated.id);
+    if (idx != -1) {
+      _friendExpenses[idx] = updated;
+      await _saveFriendExpenses();
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteFriendExpense(String expenseId) async {
+    _friendExpenses.removeWhere((e) => e.id == expenseId);
+    await _saveFriendExpenses();
+    notifyListeners();
   }
 
   Future<void> _loadFriendExpenses() async {
@@ -147,4 +163,7 @@ class ExpenseProvider extends ChangeNotifier {
     final file = File('${storageDir.path}/$_friendExpenseFile');
     await file.writeAsString(json.encode(_friendExpenses.map((e) => e.toJson()).toList()));
   }
+
+
+
 }
